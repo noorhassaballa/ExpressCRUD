@@ -5,21 +5,22 @@ import bodyParser from 'body-parser';
 import 'dotenv/config';
 
 const app = express();
-// the below set up bodyParser to handle data from React or Postman
+// set up bodyParser to handle data from React or Postman
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-// process.env.NAME gets the value of NAME from your .env file
+// set port for cors
 const port = process.env.PORT;
 app.use(cors({ origin: 'http://localhost:5173' }));
 
+// connect to mysql database
 const db = mysql.createConnection({
     host: 'thresholds-test.mysql.database.azure.com',
-    user: process.env.USERNAME, // Replace with your MySQL username
-    port: process.env.PORT, // Replace with the port you need - may be different from mine
-    password: process.env.PASSWORD, // Replace with your MySQL password
-    database: 'tasks', // Replace with your database name
+    user: process.env.SQL_USER,
+    port: 3306, 
+    password: process.env.PASSWORD,
+    database: 'nhassaballa_tasks',
 });
 
 db.connect((err) => {
@@ -30,26 +31,24 @@ db.connect((err) => {
     console.log('Connected to the database');
 });
 
-// app.get, .post, .push - these are all set to handle different
-// HTTP verbs/methods - we should talk about these
-// I like to call these "routes"
+//routes
 app.get('/', (req, res) => {
     res.send('Welcome to the jungle');
 })
 
 app.get('/tasks', (req, res) => {
-    const query = "SELECT * FROM tasks;";
+    const query = 'select * from nhassaballa_tasks.tasks'
 
     db.query(query, (err, results) => {
         if (err) {
-            console.log("Error getting tasks");
+            console.log("uh oh, spaghettio's")
             console.log(err);
             res.status(500).json({error: 'Error getting tasks.'})
-        }
-        else {
+        } else {
             res.json(results);
         }
     })
+    
 })
 
 // new route to add a task to the database
