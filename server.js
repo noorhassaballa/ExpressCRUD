@@ -37,10 +37,10 @@ app.get('/', (req, res) => {
     res.send('Welcome to the jungle');
 })
 
-// GET request to retrieve tasks from database
+// GET request to retrieve all tasks from database
 app.get('/tasks', (req, res) => {
     // sql query
-    const query = 'select * from nhassaballa_tasks.tasks'
+    const query = 'SELECT * from tasks'
 
     // run sql query
     db.query(query, (err, results) => {
@@ -48,6 +48,24 @@ app.get('/tasks', (req, res) => {
             console.log("uh oh, spaghettio's! error retrieving tasks")
             console.log(err);
             res.status(500).json({error: 'Error getting tasks.'})
+        } else {
+            res.json(results);
+        }
+    })
+    
+})
+
+// GET request to retrieve a single task from database
+app.get('/tasks/1', (req, res) => {
+    // sql query
+    const query = 'SELECT * FROM tasks WHERE id=1'
+
+    // run sql query
+    db.query(query, (err, results) => {
+        if (err) {
+            console.log("uh oh, spaghettio's! error retrieving first task")
+            console.log(err);
+            res.status(500).json({error: 'Error getting first task.'})
         } else {
             res.json(results);
         }
@@ -74,6 +92,27 @@ app.post('/tasks', (req, res) => {
         }
     })
 })
+
+// PUT request to update task in database
+app.put('/tasks/1/completed', (req, res) => {
+
+    const params = [req.body['is_completed']];
+    console.log(req.body)
+    
+    const query = "UPDATE tasks SET is_completed=1 WHERE id=1;"
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.log("uh oh, spaghettio's! error updating task");
+            console.log(err);
+            res.status(500).json({error: 'Error updating task completion.'})
+        }
+        else {
+            res.status(200).json(results);
+        }
+    })
+})
+
 
 // starts the app
 app.listen(port, () => {
