@@ -56,16 +56,18 @@ app.get('/tasks', (req, res) => {
 })
 
 // GET request to retrieve a single task from database
-app.get('/tasks/1', (req, res) => {
-    // sql query
-    const query = 'SELECT * FROM tasks WHERE id=1'
+app.get('/tasks', (req, res) => {
 
-    // run sql query
+    const params = [req.body['id']];
+    console.log(req.body)
+
+    const query = 'SELECT * FROM tasks WHERE id= (?)'
+
     db.query(query, (err, results) => {
         if (err) {
-            console.log("uh oh, spaghettio's! error retrieving first task")
+            console.log("uh oh, spaghettio's! error retrieving task")
             console.log(err);
-            res.status(500).json({error: 'Error getting first task.'})
+            res.status(500).json({error: 'Error getting task.'})
         } else {
             res.json(results);
         }
@@ -94,7 +96,7 @@ app.post('/tasks', (req, res) => {
 })
 
 // PUT request to update task in database
-app.put('/tasks/1/completed', (req, res) => {
+app.put('/tasks/completed', (req, res) => {
 
     const params = [req.body['is_completed']];
     console.log(req.body)
@@ -106,6 +108,26 @@ app.put('/tasks/1/completed', (req, res) => {
             console.log("uh oh, spaghettio's! error updating task");
             console.log(err);
             res.status(500).json({error: 'Error updating task completion.'})
+        }
+        else {
+            res.status(200).json(results);
+        }
+    })
+})
+
+// DELETE request to remove a task in database
+app.delete('/tasks/delete', (req, res) => {
+
+    const params = [req.body['is_completed']];
+    console.log(req.body)
+    
+    const query = "DELETE FROM tasks WHERE is_completed=1"
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.log("uh oh, spaghettio's! error deleting task");
+            console.log(err);
+            res.status(500).json({error: 'Error deleting task from database.'})
         }
         else {
             res.status(200).json(results);
