@@ -56,11 +56,12 @@ app.get('/tasks', (req, res) => {
 })
 
 // GET request to retrieve a single task from database
-app.get('/tasks/1', (req, res) => {
+app.get('/tasks/:id', (req, res) => {
+    const taskId = req.params.id;
 
-    const query = 'SELECT * FROM tasks WHERE id=3;'
+    const query = 'SELECT * FROM tasks WHERE id = ?;'
 
-    db.query(query, (err, results) => {
+    db.query(query, [taskId], (err, results) => {
         if (err) {
             console.log("uh oh, spaghettio's! error retrieving task")
             console.log(err);
@@ -93,11 +94,13 @@ app.post('/tasks', (req, res) => {
 })
 
 // PUT request to update task in database
-app.put('/tasks/completed', (req, res) => {
-    
-    const query = "UPDATE tasks SET is_completed=1 WHERE id = 2;"
+app.put('/tasks/completed/:id', (req, res) => {
 
-    db.query(query, (err, results) => {
+    const taskId = req.params.id;
+    
+    const query = "UPDATE tasks SET is_completed = 1 WHERE id = ?;"
+
+    db.query(query, [taskId], (err, results) => {
         if (err) {
             console.log("uh oh, spaghettio's! error updating task");
             console.log(err);
