@@ -97,14 +97,35 @@ app.post('/tasks', (req, res) => {
 app.put('/tasks/completed/:id', (req, res) => {
 
     const taskId = req.params.id;
-    
-    const query = "UPDATE tasks SET is_completed = 1 WHERE id = ?;"
+    const { title, description, is_completed } = req.body;
+
+    let query = "UPDATE tasks SET";
+    let values = [];
+ 
+    if (title) {
+        query += "title = ?, ";
+        values.push(title);
+    }
+ 
+    if (description) {
+        query += "description = ?, ";
+        values.push(description);
+    }
+ 
+    if (is_completed !== undefined) {
+        query += "is_completed = ?, ";
+        values.push(is_completed);
+    }
+ 
+    query = query.slice(0, -2);
+    query += "WHERE id = ?";
+    values.push(taskId);
 
     db.query(query, [taskId], (err, results) => {
         if (err) {
             console.log("uh oh, spaghettio's! error updating task");
             console.log(err);
-            res.status(500).json({error: 'Error updating task completion.'})
+            res.status(500).json({error: 'Error updating task.'})
         }
         else {
             res.status(200).json(results);
